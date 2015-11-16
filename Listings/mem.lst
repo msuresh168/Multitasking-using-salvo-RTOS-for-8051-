@@ -1,0 +1,276 @@
+C51 COMPILER V9.54   MEM                                                                   08/05/2015 16:08:08 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MEM
+OBJECT MODULE PLACED IN .\Objects\mem.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE C:\salvo\src\mem.c OPTIMIZE(8,SPEED) BROWSE INCDIR(C:\salvo\inc) DEFINE(
+                    -MAKE_WITH_FREE_LIB,SYSI) DEBUG OBJECTEXTEND PRINT(.\Listings\mem.lst) TABS(2) OBJECT(.\Objects\mem.obj)
+
+line level    source
+
+   1          /************************************************************ 
+   2          The contents of this file are subject to the Pumpkin Salvo
+   3          License (the "License").  You may not use this file except
+   4          in compliance with the License. You may obtain a copy of
+   5          the License at http://www.pumpkininc.com, or from
+   6          warranty@pumpkininc.com.
+   7          
+   8          Software distributed under the License is distributed on an
+   9          "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+  10          or implied. See the License for specific language governing
+  11          the warranty and the rights and limitations under the
+  12          License.
+  13          
+  14          The Original Code is Salvo - The RTOS that runs in tiny
+  15          places(TM). Copyright (C) 1995-2002 Pumpkin, Inc. and its
+  16          Licensor(s). All Rights Reserved.
+  17          
+  18          $Source: C:\\RCS\\d\\salvo\\src\\mem.c,v $
+  19          $Author: aek $
+  20          $Revision: 3.28 $
+  21          $Date: 2003-07-24 15:18:23-07 $
+  22          
+  23          Global variable declarations.
+  24          
+  25          ************************************************************/
+  26          
+  27          #if !defined(__OSMEM_C)
+  28          #define __OSMEM_C
+  29           
+  30          #include <salvo.h>
+  31          
+  32          /************************************************************ 
+  33          ****                                                     ****
+  34          **                                                         **
+  35          ICCAVR users can force Salvo's global objects into a unique
+  36          program area called salvoram. When used, specify the start
+  37          and end addresses of this program area via:  
+  38                    
+  39            -bsalvoram:0xstart.0xend    
+  40                                 
+  41          as a linker option. Otherwise the salvoram program area will
+  42          simply follow the data program area (default). 
+  43               
+  44          MPLAB-C18 requires an explicitly defined segment. Can only
+  45          do all-or-nothing -- that's why OSLOC_ALL cannot be used.
+  46          
+  47          **                                                         **
+  48          ****                                                     ****
+  49          ************************************************************/
+  50          #if ( (OSCOMPILER == OSIMAGECRAFT) && (OSTARGET == OSAVR) )
+              #pragma data:salvoram  
+              #endif  
+  53          
+  54          
+C51 COMPILER V9.54   MEM                                                                   08/05/2015 16:08:08 PAGE 2   
+
+  55          #if ( (OSCOMPILER == OSMPLAB_C18) \
+  56            &&  (OSMPLAB_C18_LOC_ALL_NEAR == TRUE) )
+              #pragma udata access OSVars
+              #endif
+  59          
+  60          
+  61          /* by placing OScTcbP as the first Salvo object, we're  */
+  62          /*  able to avoid problems that crop up with targets    */
+  63          /*  that allow placement of variables at address 0      */
+  64          /*  (e.g. PIC18+MPLAB-C18, 8051+xdata, etc.). This      */
+  65          /*  works because we never point to OScTcbP.            */
+  66          #if OSENABLE_TASKS
+  67          #include <salvoprg.h>
+  68          OSgltypeCTcbP OScTcbP;
+  69          #endif
+  70          
+  71          
+  72          #if OSUSE_ARRAYS
+              #if OSARRAY_SIZE_IS_BYTE
+              const OStypePrioA OSBits[8] = 
+                      { 0x0001, 0x0002, 0x0004, 0x0008,
+                        0x0010, 0x0020, 0x0040, 0x0080 };
+              #else
+              const OStypePrioA OSBits[16] = 
+                      { 0x0001, 0x0002, 0x0004, 0x0008,
+                        0x0010, 0x0020, 0x0040, 0x0080,
+                        0x0100, 0x0200, 0x0400, 0x0800,
+                        0x1000, 0x2000, 0x4000, 0x8000 }; 
+              #endif /* #if OSTASKS < 9 */    
+              #endif
+  85          
+  86          
+  87          #if OSENABLE_TASKS
+  88          #include <salvoprg.h>
+  89          OSgltypeTcb OStcbArea[OSTASKS];
+  90          #endif
+  91          
+  92          
+  93          #if OSENABLE_TASKS && !OSUSE_ARRAYS
+  94          #include <salvoprg.h>
+  95          OSgltypeTcbP OSeligQP;
+  96          #endif
+  97          
+  98          
+  99          #if OSENABLE_TASKS && OSUSE_ARRAYS
+              #include <salvoprg.h>
+              OSgltypePrioA OSeligQP;
+              #endif
+ 103          
+ 104          
+ 105          #if OSENABLE_EVENTS
+              #include <salvoprg.h>
+              OSgltypeEcb OSecbArea[OSEVENTS];
+              #endif
+ 109          
+ 110          
+ 111          #if OSENABLE_SIGQ
+              #include <salvoprg.h>
+              OSgltypeSigQP OSsigQinP;
+              #endif
+ 115          
+ 116          
+C51 COMPILER V9.54   MEM                                                                   08/05/2015 16:08:08 PAGE 3   
+
+ 117          #if OSENABLE_SIGQ
+              #include <salvoprg.h>
+              OSgltypeSigQP OSsigQoutP;
+              #endif
+ 121          
+ 122          
+ 123          #if OSENABLE_EVENT_FLAGS && OSEVENT_FLAGS
+              #include <salvoprg.h>
+              OSgltypeEfcb OSefcbArea[OSEVENT_FLAGS];
+              #endif
+ 127          
+ 128          
+ 129          #if OSENABLE_MESSAGE_QUEUES && OSMESSAGE_QUEUES
+              #include <salvoprg.h>
+              OSgltypeMqcb OSmqcbArea[OSMESSAGE_QUEUES];
+              #endif
+ 133          
+ 134          
+ 135          #if OSENABLE_DELAYS || OSENABLE_TIMEOUTS
+              #include <salvoprg.h>
+              OSgltypeTcbP OSdelayQP;
+              #endif
+ 139          
+ 140          
+ 141          #if OSENABLE_STACK_CHECKING
+              #include <salvoprg.h>
+              OSgltypeDepth OSstkDepth, OSmaxStkDepth;
+              #endif
+ 145          
+ 146          
+ 147          #if OSGATHER_STATISTICS && OSENABLE_COUNTS
+              #include <salvoprg.h>
+              OSgltypeCount OSctxSws;
+              #endif
+ 151          
+ 152          
+ 153          #if OSGATHER_STATISTICS && OSENABLE_COUNTS && OSENABLE_IDLE_COUNTER
+              #include <salvoprg.h>
+              OSgltypeCount OSidleCtxSws;
+              #endif
+ 157          
+ 158          
+ 159          #if OSGATHER_STATISTICS && OSENABLE_TIMEOUTS
+              #include <salvoprg.h>
+              OSgltypeErr OStimeouts;
+              #endif
+ 163          
+ 164          
+ 165          #if OSLOGGING
+              #include <salvoprg.h>
+              OSgltypeErr OSerrs, OSwarns;
+              #endif
+ 169           
+ 170           
+ 171          #if OSLOG_MESSAGES > OSLOG_NONE
+              #include <salvoprg.h>
+              OSgltypeLogMsg OSlogMsg[80];
+              #endif
+ 175          
+ 176          
+ 177          #if OSENABLE_TICKS
+ 178          #include <salvoprg.h>
+C51 COMPILER V9.54   MEM                                                                   08/05/2015 16:08:08 PAGE 4   
+
+ 179          OSgltypeTick OStimerTicks;
+ 180          #endif
+ 181          
+ 182          
+ 183          #if OSENABLE_PRESCALAR
+              #include <salvoprg.h>
+              OSgltypePS OStimerPS;
+              #endif
+ 187          
+ 188          
+ 189          #if OSCTXSW_METHOD == OSRTNADDR_IS_VAR
+              #include <salvoprg.h>
+              OStypeRtnAddr OSrtnAddr;
+              #endif
+ 193          
+ 194          
+ 195          #if OSENABLE_DELAYS
+              #include <salvoprg.h>
+              OSgltypeLostTick OSlostTicks;
+              #endif
+ 199          
+ 200          
+ 201          /* levels are supported, target-dependent */
+ 202          #if ( (OSCTXSW_METHOD == OSVIA_OSDISPATCH) \
+ 203            &&  (OSMONITOR_KEYWORD_EXISTS == FALSE) )
+              #include <salvoprg.h>
+              OSgltypeSRGIE OSsrGIE;
+              #endif
+ 207          
+ 208          
+ 209          #if ( (OSCTXSW_METHOD == OSVIA_OSDISPATCH) \
+ 210            ||  (OSCTXSW_METHOD == OSVIA_OSDISPATCH_WLABEL) )
+              #include <salvoprg.h>
+              OSgltypeFrameP OSframeP;
+              #endif
+ 214          
+ 215          
+ 216          /* eight levels are more than enough ... */
+ 217          #if ( OSCOMPILER == OSIAR_ICC ) && ( OSTARGET == OSPIC18 )
+              
+              #define OSLOC_SAVEPIC18INTS __nonbanked /* always */
+              
+              #if OSPIC18_INTERRUPT_MASK & 0x80
+              #include <salvoprg.h>
+              OSLOC_SAVEPIC18INTS OStypeInt8u OSsavePIC18GIE;
+              #endif
+              
+              #if OSPIC18_INTERRUPT_MASK & 0x40
+              #include <salvoprg.h>
+              OSLOC_SAVEPIC18INTS OStypeInt8u OSsavePIC18PEIE;
+              #endif
+              
+              #undef OSLOC_SAVEPIC18INTS
+              
+              #endif
+ 234          
+ 235          
+ 236          /* revert to normal data program area */
+ 237          #if ( (OSCOMPILER == OSIMAGECRAFT) && (OSTARGET == OSAVR) )
+              #pragma data:data  
+              #endif  
+ 240          
+C51 COMPILER V9.54   MEM                                                                   08/05/2015 16:08:08 PAGE 5   
+
+ 241          
+ 242          
+ 243          
+ 244          #endif /* __OSMEM_C #include guard */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     14    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

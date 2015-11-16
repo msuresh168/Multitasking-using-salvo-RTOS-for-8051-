@@ -1,0 +1,6 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+"C:\salvo\lib\kc51\sfc51sdmb.lib",
+".\Objects\mem.obj" 
+TO ".\Objects\Multitasking_8051" 
+PRINT(".\Listings\Multitasking_8051.m51") RAMSIZE(256) 

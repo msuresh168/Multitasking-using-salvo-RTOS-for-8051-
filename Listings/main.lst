@@ -1,0 +1,76 @@
+C51 COMPILER V9.54   MAIN                                                                  08/05/2015 16:08:08 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(C:\salvo\inc) DEFINE(MAKE_WITH_FR
+                    -EE_LIB,SYSI) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include "main.h"
+   2          #include "salvo.h"
+   3          
+   4          
+   5          
+   6          _OSLabel(TA)
+   7          _OSLabel(TB)
+   8          _OSLabel(TC)
+   9          _OSLabel(TD)
+  10          
+  11          void TaskA( void )
+  12          {
+  13   1          for (;;)
+  14   1              OS_Yield(TA);
+  15   1      }
+  16          
+  17          void TaskB( void )
+  18          {
+  19   1          for (;;)
+  20   1              OS_Yield(TB);
+  21   1      }
+  22          
+  23          
+  24          void TaskC( void )
+  25          {
+  26   1          for (;;)
+  27   1              OS_Yield(TC);
+  28   1      }
+  29          
+  30          void TaskD( void )
+  31          {
+  32   1          for (;;)
+  33   1              OS_Yield();
+  34   1      }
+  35          
+  36          void main(){
+  37   1        
+  38   1      Init();
+  39   1      
+  40   1          OSInit();
+  41   1          
+  42   1          OSCreateTask(TaskA, OSTCBP(1), 10);
+  43   1          OSCreateTask(TaskB, OSTCBP(2), 10);
+  44   1          OSCreateTask(TaskC, OSTCBP(3), 10);
+  45   1          OSCreateTask(TaskD, OSTCBP(4), 10);
+  46   1      
+  47   1          for (;;)
+  48   1              OSSched();
+  49   1        
+  50   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     72    ----
+C51 COMPILER V9.54   MAIN                                                                  08/05/2015 16:08:08 PAGE 2   
+
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
